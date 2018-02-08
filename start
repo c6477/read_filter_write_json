@@ -1,0 +1,127 @@
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.net.URLConnection;
+import org.json.JSONArray;
+import org.json.JSONObject;
+import java.io.FileWriter;
+
+
+public class challenge {
+
+	
+	
+      public static String getText(String url) throws Exception {
+    	  
+
+    		/*
+    		 *   Einlesen der Datei von URL
+    		 *   Read file from URL
+    		 * 
+    		 */
+    	  
+            URL website = new URL(url);
+            URLConnection connection = website.openConnection();
+            BufferedReader in = new BufferedReader( new InputStreamReader(connection.getInputStream(),"UTF8"));
+
+            StringBuilder response = new StringBuilder();
+            String inputLine;
+
+            while ((inputLine = in.readLine()) != null) 
+                response.append(inputLine);
+
+            in.close();
+
+            return response.toString();
+        }
+
+    public static void main(String[] args) throws Exception {
+
+    	/*
+    	 *  Eingelesene Datei wird an Array übergeben
+    	 *  Erzeugen von JsonArray und JsonObject
+    	 *  Schleife durch Array und Abfrage der einzelnen Objekte
+    	 *  
+    	 * 	Read file stored in array
+    	 *    Create JsonArray and JsonObject
+    	 * 	Loop through array and query each object
+    	 * 
+    	 */
+        
+            JSONArray jsonArray=new JSONArray(getText("https://data.sfgov.org/resource/wwmu-gmzc.json")); 
+       
+            JSONArray filtered = new JSONArray();
+ 
+            	     
+        for (int i = 0; i < jsonArray.length(); ++i)  {
+        	
+            		JSONObject passport = new JSONObject();
+        	
+            	     JSONObject jsonobject = jsonArray.getJSONObject(i);
+            	   
+            	     String Titel = jsonobject.getString("title");
+            	     String locations;
+            	       	 passport.put("title", Titel);
+            	     if (jsonobject.isNull("locations") == false) {    	     
+            	    
+            	    /*
+            	     * Abfrage der einzelnen Objete, Objekt = title
+            	     * Abfrage der locations Objekte auf NULL
+            	     * 
+            	     * Query each object, object = title
+            	     * Query object locations for NULL
+            	     */
+        	    	 locations = jsonobject.getString("locations");
+        	    	 
+        	         System.out.print("Loop_:  " +i);
+            	     System.out.print("Titel:  " +Titel);
+            	     System.out.print("   Locations:" +locations);
+            	     System.out.println("");
+            	     passport.put("locations", locations);
+        	    	 }
+            	     else {
+            	    	 locations = ("NULL");
+            	    	
+            	    	 System.out.print("Loop_:  " +i);
+                	     System.out.print("Titel:  " +Titel);
+                	     System.out.print("   Locations:" +locations);
+                	     System.out.println(""); 
+                	     passport.put("locations", locations);
+            	     }
+            	    
+            	     /*
+            	      * Nach jedem Schleifendurchgang werden die Werte 
+            	      * von Object an das Ergebnis Array übergeben
+            	      * 
+            	      * After each iteration the value of the object
+            	      * will be stored in the result array
+            	      * 
+            	      */
+            	     
+            	     filtered.put(passport);
+            	     System.out.println(filtered.opt(0));
+            	     
+            	 	         	    	
+        }
+                    /*
+                     * Ergebnis Array wird in Datei geschrieben
+                     * 
+                     * Write result array in file 
+                     */
+        
+        
+            	 try (FileWriter result = new FileWriter("C:/test/result.json")) {
+            		 
+            		 result.write(filtered.toString());
+            		 result.flush();
+            		 result.close();
+            	 }
+            	 
+            	          	 
+            	     }
+            	     
+            	 }
+       
+
+
